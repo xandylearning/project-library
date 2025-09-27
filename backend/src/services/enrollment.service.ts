@@ -62,7 +62,7 @@ export class EnrollmentService {
     const progressMap = new Map<string, boolean>()
     const checklistProgressMap = new Map<string, boolean>()
     
-    enrollment.progress.forEach(p => {
+    enrollment.progress.forEach((p: any) => {
       progressMap.set(p.stepId, p.completed)
       if (p.checklistId) {
         checklistProgressMap.set(p.checklistId, p.completed)
@@ -70,20 +70,20 @@ export class EnrollmentService {
     })
     
     // Transform to DTO format
-    const stepsWithProgress = enrollment.Project.steps.map(step => ({
+    const stepsWithProgress = enrollment.Project.steps.map((step: any) => ({
       step: {
         id: step.id,
         order: step.order,
         title: step.title,
         description: step.description
       },
-      checklist: step.checklist.map(item => ({
+      checklist: step.checklist.map((item: any) => ({
         id: item.id,
         order: item.order,
         text: item.text,
         completed: checklistProgressMap.get(item.id) || false
       })),
-      resources: step.resources.map(resource => ({
+      resources: step.resources.map((resource: any) => ({
         id: resource.id,
         title: resource.title,
         url: resource.url,

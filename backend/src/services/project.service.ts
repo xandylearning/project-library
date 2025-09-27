@@ -121,7 +121,7 @@ export class ProjectService {
     ])
     
     // Transform to DTO format
-    const projectCards = projects.map(project => ({
+    const projectCards = projects.map((project: any) => ({
       slug: project.slug,
       title: project.title,
       shortDesc: project.shortDesc,
@@ -129,8 +129,8 @@ export class ProjectService {
       classMax: project.classMax,
       level: project.level,
       guidance: project.guidance,
-      tags: project.tags.map(t => t.Tag.name),
-      subjects: project.subjects.map(s => s.Subject.name)
+      tags: project.tags.map((t: any) => t.Tag.name),
+      subjects: project.subjects.map((s: any) => s.Subject.name)
     }))
     
     return {
@@ -180,12 +180,12 @@ export class ProjectService {
       classMax: project.classMax,
       level: project.level,
       guidance: project.guidance,
-      subjects: project.subjects.map(s => s.Subject.name),
-      tags: project.tags.map(t => t.Tag.name),
-      tools: project.tools.map(t => t.name),
+      subjects: project.subjects.map((s: any) => s.Subject.name),
+      tags: project.tags.map((t: any) => t.Tag.name),
+      tools: project.tools.map((t: any) => t.name),
       prerequisites: project.prerequisites,
       durationHrs: project.durationHrs,
-      steps: project.steps.map(step => ({
+      steps: project.steps.map((step: any) => ({
         id: step.id,
         order: step.order,
         title: step.title,

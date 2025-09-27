@@ -118,7 +118,7 @@ export const submissionRoutes: FastifyPluginAsync = async (fastify) => {
     })
     
     return {
-      submissions: submissions.map(s => ({
+      submissions: submissions.map((s: any) => ({
         id: s.id,
         urlOrText: s.urlOrText,
         createdAt: s.createdAt
