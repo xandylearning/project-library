@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useAdminAuth } from '@/lib/admin-auth'
 import { projectsAPI } from '@/lib/api'
 import { ProjectForm } from '@/components/project-form'
@@ -11,12 +11,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Link from 'next/link'
 
 interface EditProjectPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default function EditProject({ params }: EditProjectPageProps) {
+  const resolvedParams = use(params)
   const { token } = useAdminAuth()
   const router = useRouter()
   const [project, setProject] = useState<any>(null)
@@ -24,15 +25,15 @@ export default function EditProject({ params }: EditProjectPageProps) {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (token && params.id) {
+    if (token && resolvedParams.id) {
       fetchProject()
     }
-  }, [token, params.id])
+  }, [token, resolvedParams.id])
 
   const fetchProject = async () => {
     try {
       setIsLoading(true)
-      const projectData = await projectsAPI.getAdminProject(token!, params.id)
+      const projectData = await projectsAPI.getAdminProject(token!, resolvedParams.id)
       
       // Transform backend data to form structure
       const transformedData = {

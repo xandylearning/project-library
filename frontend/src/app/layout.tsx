@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Project Library',
   description: 'A comprehensive web-based Project Library platform for AI/ML school projects',
+  icons: {
+    icon: '/images/logo/favicon.ico',
+  },
 }
 
 export default function RootLayout({
