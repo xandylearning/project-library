@@ -23,10 +23,12 @@ yarn-error.log*
 backend/dist/
 frontend/.next/
 frontend/out/
+frontend/tsconfig.tsbuildinfo
 
 # Database
 *.db
 *.sqlite
+backend/prisma/dev.db
 
 # IDE and editor files
 .vscode/
@@ -87,3 +89,28 @@ replit.nix
 # Temporary files
 *.tmp
 *.temp
+
+# TypeScript
+*.tsbuildinfo
+
+# Next.js specific
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# Docker
+.dockerignore
+
+# Package manager lock files (keep package-lock.json but ignore others)
+yarn.lock
+pnpm-lock.yaml
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+
+# Storybook
+frontend/.storybook/
+frontend/storybook-static/
