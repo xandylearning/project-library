@@ -69,17 +69,28 @@ RUN apk add --no-cache dumb-init wget
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 appuser
 
+# Copy frontend built files FIRST (standalone output includes its own node_modules)
+# The standalone output structure is: standalone/frontend/server.js, standalone/frontend/.next/, etc.
+# Copy the entire standalone directory structure
+COPY --from=frontend-builder --chown=appuser:nodejs /app/frontend/.next/standalone ./
+# The standalone output has: ./frontend/server.js, ./frontend/.next/, ./node_modules/
+# We need to ensure static files are in the right place
+# Static files should already be in frontend/.next/static from the standalone build
+# But we also copy them explicitly to ensure they're accessible
+COPY --from=frontend-builder --chown=appuser:nodejs /app/frontend/.next/static ./frontend/.next/static
+# Public files should be in frontend/public (already in standalone, but ensure they're there)
+COPY --from=frontend-builder --chown=appuser:nodejs /app/frontend/public ./frontend/public
+
 # Copy backend built files
 COPY --from=backend-builder --chown=appuser:nodejs /app/backend/dist ./backend/dist
-COPY --from=backend-builder --chown=appuser:nodejs /app/node_modules ./node_modules
 COPY --from=backend-builder --chown=appuser:nodejs /app/backend/prisma ./backend/prisma
 COPY --from=backend-builder --chown=appuser:nodejs /app/package.json ./package.json
 COPY --from=backend-builder --chown=appuser:nodejs /app/backend/package.json ./backend/
 
-# Copy frontend built files (standalone output)
-COPY --from=frontend-builder --chown=appuser:nodejs /app/frontend/.next/standalone ./
-COPY --from=frontend-builder --chown=appuser:nodejs /app/frontend/.next/static ./frontend/.next/static
-COPY --from=frontend-builder --chown=appuser:nodejs /app/frontend/public ./frontend/public
+# Copy backend node_modules (for Prisma CLI and backend runtime)
+# Note: This will merge with standalone's node_modules (standalone's are already there)
+# Backend needs: prisma, @prisma/client, fastify, etc.
+COPY --from=backend-builder --chown=appuser:nodejs /app/node_modules ./node_modules
 
 # Create directories for storage and database
 RUN mkdir -p /app/backend/storage/projects /app/backend/prisma

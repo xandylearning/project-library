@@ -32,11 +32,30 @@ done
 
 # Start frontend server on port 3000 (Cloud Run exposed port)
 echo "🎨 Starting frontend server on port 3000..."
-cd /app
+
+# Find the Next.js server file
+FRONTEND_SERVER=""
+if [ -f "/app/frontend/server.js" ]; then
+  FRONTEND_SERVER="/app/frontend/server.js"
+  cd /app/frontend
+elif [ -f "/app/server.js" ]; then
+  FRONTEND_SERVER="/app/server.js"
+  cd /app
+else
+  echo "❌ ERROR: Next.js server.js not found!"
+  echo "📁 Contents of /app:"
+  ls -la /app/ | head -30 || true
+  echo "📁 Contents of /app/frontend (if exists):"
+  ls -la /app/frontend/ 2>/dev/null | head -20 || echo "  frontend directory not found"
+  exit 1
+fi
+
+echo "✅ Found Next.js server.js at $FRONTEND_SERVER"
+
 # Set backend URL for Next.js rewrites (empty NEXT_PUBLIC_BACKEND_URL means use relative URLs)
 export NEXT_PUBLIC_BACKEND_URL=""
 export BACKEND_URL="http://localhost:3001"
-PORT=3000 node server.js &
+PORT=3000 node "$FRONTEND_SERVER" &
 FRONTEND_PID=$!
 
 echo "✅ Project Library is running!"
