@@ -20,7 +20,7 @@ on:
 env:
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }} # e.g. developement-account
   GCP_REGION: asia-south1
-  CLOUD_RUN_SERVICE: ai4kerala_project_library
+  CLOUD_RUN_SERVICE: ai4kerala-project-library
   ARTIFACT_REPOSITORY: xandylearning
   ARTIFACT_REGISTRY_HOST: asia-south1-docker.pkg.dev
 
