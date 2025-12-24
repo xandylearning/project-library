@@ -391,7 +391,7 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 <div align="center">
 
-**Made with ❤️ for Kerala's AI Education**
+**Made with ❤️ for Kerala's AI Education by xandy**
 
 [Website](https://www.ai4kerala.org/) • [Documentation](./docs/) • [Contributing](./CONTRIBUTING.md) • [License](./LICENSE)
 
