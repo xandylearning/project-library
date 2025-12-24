@@ -15,7 +15,7 @@ export const submissionRoutes: FastifyPluginAsync = async (fastify) => {
     const enrollment = await prisma.enrollment.findUnique({
       where: { id: enrollmentId },
       include: {
-        Project: {
+        project: {
           include: {
             submission: true
           }
@@ -32,7 +32,7 @@ export const submissionRoutes: FastifyPluginAsync = async (fastify) => {
       })
     }
     
-    if (!enrollment.Project.submission) {
+    if (!enrollment.project.submission) {
       return reply.status(400).send({
         type: 'https://docs/errors/validation',
         title: 'No Submission Required',
@@ -41,7 +41,7 @@ export const submissionRoutes: FastifyPluginAsync = async (fastify) => {
       })
     }
     
-    const submissionSpec = enrollment.Project.submission
+    const submissionSpec = enrollment.project.submission
     let submissionContent = ''
     
     if (submissionSpec.type === 'FILE') {

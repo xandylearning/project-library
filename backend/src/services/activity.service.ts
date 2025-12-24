@@ -36,9 +36,20 @@ export class ActivityService {
   static async logActivity(data: LogActivityData) {
     const { enrollmentId, activityType, metadata } = data
 
+    // Get enrollment to find userId
+    const enrollment = await prisma.enrollment.findUnique({
+      where: { id: enrollmentId },
+      select: { userId: true }
+    })
+
+    if (!enrollment || !enrollment.userId) {
+      throw new Error('Enrollment not found or not linked to a user')
+    }
+
     // Create activity record
     const activity = await prisma.userActivity.create({
       data: {
+        userId: enrollment.userId,
         enrollmentId,
         activityType,
         metadata: metadata ? JSON.stringify(metadata) : null
@@ -94,11 +105,11 @@ export class ActivityService {
         take: limit,
         skip: offset,
         include: {
-          Enrollment: {
+          enrollment: {
             select: {
               email: true,
               name: true,
-              Project: {
+              project: {
                 select: {
                   title: true,
                   slug: true
@@ -205,11 +216,11 @@ export class ActivityService {
       orderBy: { createdAt: 'desc' },
       take: limit,
       include: {
-        Enrollment: {
+        enrollment: {
           select: {
             email: true,
             name: true,
-            Project: {
+            project: {
               select: {
                 title: true,
                 slug: true
@@ -233,7 +244,7 @@ export class ActivityService {
     const enrollment = await prisma.enrollment.findUnique({
       where: { id: enrollmentId },
       include: {
-        Project: {
+        project: {
           select: {
             title: true
           }
@@ -263,7 +274,7 @@ export class ActivityService {
         const { MessageService } = await import('./message.service')
         await MessageService.createSystemMessage({
           title: 'Congratulations on Completing Your Project!',
-          content: `You've successfully completed "${enrollment.Project.title}". Well done! Keep up the great work.`,
+          content: `You've successfully completed "${enrollment.project.title}". Well done! Keep up the great work.`,
           recipientId: enrollment.userId
         })
       } catch (error) {

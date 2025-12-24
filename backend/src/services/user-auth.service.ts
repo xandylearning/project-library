@@ -146,7 +146,7 @@ export class UserAuthService {
     // First, ensure user has only one enrollment (keep latest)
     const allEnrollments = await prisma.enrollment.findMany({
       where: { userId },
-      include: { Group: true },
+      include: { group: true },
       orderBy: { createdAt: 'desc' }
     })
 
@@ -168,7 +168,7 @@ export class UserAuthService {
       include: {
         enrollments: {
           include: {
-            Project: {
+            project: {
               select: {
                 id: true,
                 slug: true,
@@ -178,7 +178,7 @@ export class UserAuthService {
                 guidance: true
               }
             },
-            Group: true,
+            group: true,
             progress: true
           },
           orderBy: { createdAt: 'desc' }
@@ -205,18 +205,18 @@ export class UserAuthService {
 
         return {
           id: enrollment.id,
-          project: enrollment.Project,
+          project: enrollment.project,
           enrolledAt: enrollment.createdAt,
           lastActivityAt: enrollment.lastActivityAt,
           completedAt: enrollment.completedAt,
-          group: enrollment.Group ? {
-            id: enrollment.Group.id,
-            teamLeaderId: enrollment.Group.teamLeaderId,
-            secondMemberName: enrollment.Group.secondMemberName,
-            secondMemberEmail: enrollment.Group.secondMemberEmail,
-            secondMemberPhoneNumber: enrollment.Group.secondMemberPhoneNumber,
-            secondMemberSchool: enrollment.Group.secondMemberSchool,
-            secondMemberClassNum: enrollment.Group.secondMemberClassNum
+          group: enrollment.group ? {
+            id: enrollment.group.id,
+            teamLeaderId: enrollment.group.teamLeaderId,
+            secondMemberName: enrollment.group.secondMemberName,
+            secondMemberEmail: enrollment.group.secondMemberEmail,
+            secondMemberPhoneNumber: enrollment.group.secondMemberPhoneNumber,
+            secondMemberSchool: enrollment.group.secondMemberSchool,
+            secondMemberClassNum: enrollment.group.secondMemberClassNum
           } : null,
           progress: {
             completedSteps,

@@ -99,16 +99,26 @@ model ProjectSubject {
 }
 
 model Enrollment {
-  id          String   @id @default(cuid())
-  projectId   String
-  email       String
-  name        String?
-  school      String?
-  classNum    Int
-  createdAt   DateTime @default(now())
-  progress    EnrollmentProgress[]
-  submissions Submission[]
-  Project     Project  @relation(fields: [projectId], references: [id])
+  id               String         @id @default(cuid())
+  projectId        String
+  email            String
+  name             String?
+  school           String?
+  classNum         Int
+  userId           String?
+  groupId          String?
+  lastActivityAt   DateTime?
+  completedAt      DateTime?
+  timeSpentMinutes Int?
+  createdAt        DateTime       @default(now())
+  progress         EnrollmentProgress[]
+  submissions      Submission[]
+  activities       UserActivity[]
+  project          Project        @relation(fields: [projectId], references: [id])
+  user             User?          @relation(fields: [userId], references: [id])
+  group            Group?         @relation(fields: [groupId], references: [id])
+  @@index([userId])
+  @@index([groupId])
 }
 
 model EnrollmentProgress {
@@ -143,4 +153,76 @@ model Admin {
   username     String   @unique
   passwordHash String
   createdAt    DateTime @default(now())
+}
+
+model User {
+  id               String         @id @default(cuid())
+  phoneNumber      String         @unique
+  email            String?
+  passwordHash     String
+  name             String?
+  school           String?
+  classNum         Int?
+  createdAt        DateTime       @default(now())
+  enrollments      Enrollment[]
+  groups           Group[]
+  activities       UserActivity[]
+  createdMessages  Message[]      @relation("MessageCreator")
+  receivedMessages Message[]      @relation("MessageRecipient")
+  messageReads     MessageRead[]
+  @@index([phoneNumber])
+}
+
+model Group {
+  id                      String      @id @default(cuid())
+  teamLeaderId            String
+  secondMemberName        String?
+  secondMemberEmail       String?
+  secondMemberPhoneNumber String?
+  secondMemberSchool      String?
+  secondMemberClassNum    Int?
+  createdAt               DateTime    @default(now())
+  updatedAt               DateTime    @updatedAt
+  teamLeader              User        @relation(fields: [teamLeaderId], references: [id])
+  enrollments             Enrollment[]
+  @@index([teamLeaderId])
+}
+
+model UserActivity {
+  id           String     @id @default(cuid())
+  userId       String
+  enrollmentId String
+  activityType String     // e.g., 'view', 'step_complete', 'checklist_complete'
+  metadata     String?    // JSON string for additional data
+  createdAt    DateTime   @default(now())
+  user         User       @relation(fields: [userId], references: [id])
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id])
+  @@index([userId])
+  @@index([enrollmentId])
+  @@index([activityType])
+}
+
+model Message {
+  id          String       @id @default(cuid())
+  type        String       // ANNOUNCEMENT, DIRECT, SYSTEM
+  title       String
+  content     String
+  recipientId String?      // For DIRECT and SYSTEM messages
+  createdById String?
+  createdAt   DateTime     @default(now())
+  createdBy   User?       @relation("MessageCreator", fields: [createdById], references: [id])
+  recipient   User?        @relation("MessageRecipient", fields: [recipientId], references: [id])
+  reads       MessageRead[]
+  @@index([recipientId])
+}
+
+model MessageRead {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  readAt    DateTime @default(now())
+  Message   Message  @relation(fields: [messageId], references: [id])
+  User      User     @relation(fields: [userId], references: [id])
+  @@unique([messageId, userId])
+  @@index([userId])
 }

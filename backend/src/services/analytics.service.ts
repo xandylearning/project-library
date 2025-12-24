@@ -14,7 +14,7 @@ export interface AnalyticsOverview {
   }
   projects: {
     totalProjects: number
-    averageEnrollmentsPerProject: number
+    averageEnrollmentsPerproject: number
   }
   submissions: {
     total: number
@@ -107,7 +107,7 @@ export class AnalyticsService {
       },
       projects: {
         totalProjects,
-        averageEnrollmentsPerProject: Math.round(enrollmentsPerProject * 10) / 10
+        averageEnrollmentsPerproject: Math.round(enrollmentsPerProject * 10) / 10
       },
       submissions: {
         total: totalSubmissions,

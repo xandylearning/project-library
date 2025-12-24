@@ -4,7 +4,7 @@
 # ========================================
 # Stage 1: Base Dependencies
 # ========================================
-FROM node:18-alpine AS deps
+FROM node:20-alpine AS deps
 WORKDIR /app
 
 # Copy package files for all workspaces
@@ -12,20 +12,21 @@ COPY package*.json ./
 COPY backend/package*.json ./backend/
 COPY frontend/package*.json ./frontend/
 
-# Install dependencies
-RUN npm ci --workspaces=false
-RUN cd backend && npm ci
-RUN cd frontend && npm ci
+# Install dependencies (single install for all workspaces)
+RUN npm ci --workspaces --include-workspace-root
 
 # ========================================
 # Stage 2: Build Backend
 # ========================================
-FROM node:18-alpine AS backend-builder
+FROM node:20-alpine AS backend-builder
 WORKDIR /app
 
-# Copy dependencies from deps stage
+# Copy dependencies from deps stage (workspaces hoist to root)
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/backend/node_modules ./backend/node_modules
+
+# Copy workspace package.json files for workspace resolution
+COPY --from=deps /app/package.json ./package.json
+COPY --from=deps /app/backend/package.json ./backend/package.json
 
 # Copy backend source
 COPY backend ./backend
@@ -38,12 +39,15 @@ RUN npm run build
 # ========================================
 # Stage 3: Build Frontend
 # ========================================
-FROM node:18-alpine AS frontend-builder
+FROM node:20-alpine AS frontend-builder
 WORKDIR /app
 
-# Copy dependencies from deps stage
+# Copy dependencies from deps stage (workspaces hoist to root)
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/frontend/node_modules ./frontend/node_modules
+
+# Copy workspace package.json files for workspace resolution
+COPY --from=deps /app/package.json ./package.json
+COPY --from=deps /app/frontend/package.json ./frontend/package.json
 
 # Copy frontend source
 COPY frontend ./frontend
@@ -55,7 +59,7 @@ RUN npm run build
 # ========================================
 # Stage 4: Runtime
 # ========================================
-FROM node:18-alpine AS runner
+FROM node:20-alpine AS runner
 WORKDIR /app
 
 # Install dumb-init for proper signal handling and wget for health checks
@@ -67,8 +71,9 @@ RUN adduser --system --uid 1001 appuser
 
 # Copy backend built files
 COPY --from=backend-builder --chown=appuser:nodejs /app/backend/dist ./backend/dist
-COPY --from=backend-builder --chown=appuser:nodejs /app/backend/node_modules ./backend/node_modules
+COPY --from=backend-builder --chown=appuser:nodejs /app/node_modules ./node_modules
 COPY --from=backend-builder --chown=appuser:nodejs /app/backend/prisma ./backend/prisma
+COPY --from=backend-builder --chown=appuser:nodejs /app/package.json ./package.json
 COPY --from=backend-builder --chown=appuser:nodejs /app/backend/package.json ./backend/
 
 # Copy frontend built files (standalone output)

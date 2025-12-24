@@ -33,7 +33,7 @@ export class EnrollmentService {
     const enrollment = await prisma.enrollment.findUnique({
       where: { id: enrollmentId },
       include: {
-        Project: {
+        project: {
           include: {
             steps: {
               include: {
@@ -70,7 +70,7 @@ export class EnrollmentService {
     })
     
     // Transform to DTO format
-    const stepsWithProgress = enrollment.Project.steps.map((step: any) => ({
+    const stepsWithProgress = enrollment.project.steps.map((step: any) => ({
       step: {
         id: step.id,
         order: step.order,
@@ -94,14 +94,14 @@ export class EnrollmentService {
     return {
       enrollment: {
         id: enrollment.id,
-        projectSlug: enrollment.Project.slug,
+        projectSlug: enrollment.project.slug,
         email: enrollment.email,
         classNum: enrollment.classNum
       },
       project: {
-        title: enrollment.Project.title,
-        level: enrollment.Project.level,
-        guidance: enrollment.Project.guidance
+        title: enrollment.project.title,
+        level: enrollment.project.level,
+        guidance: enrollment.project.guidance
       },
       stepsWithProgress
     }
@@ -198,7 +198,7 @@ export class EnrollmentService {
     // Verify enrollment exists and belongs to user
     const enrollment = await prisma.enrollment.findUnique({
       where: { id: enrollmentId },
-      include: { Group: true }
+      include: { group: true }
     })
 
     if (!enrollment) {

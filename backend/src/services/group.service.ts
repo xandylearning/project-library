@@ -100,7 +100,7 @@ export class GroupService {
     const enrollments = await prisma.enrollment.findMany({
       where: { groupId },
       include: {
-        Project: {
+        project: {
           select: {
             id: true,
             slug: true,

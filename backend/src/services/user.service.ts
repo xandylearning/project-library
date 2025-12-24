@@ -124,7 +124,7 @@ export class UserService {
         take,
         orderBy: { createdAt: 'desc' },
         include: {
-          Project: {
+          project: {
             select: {
               id: true,
               slug: true,
@@ -226,7 +226,7 @@ export class UserService {
     const enrollment = await prisma.enrollment.findUnique({
       where: { id: enrollmentId },
       include: {
-        Project: {
+        project: {
           include: {
             steps: {
               orderBy: { order: 'asc' },
@@ -257,8 +257,8 @@ export class UserService {
       take: 50
     })
 
-    const totalSteps = enrollment.Project.steps.length
-    const totalChecklists = enrollment.Project.steps.reduce(
+    const totalSteps = enrollment.project.steps.length
+    const totalChecklists = enrollment.project.steps.reduce(
       (sum, step) => sum + step.checklist.length,
       0
     )
@@ -286,12 +286,12 @@ export class UserService {
         timeSpentMinutes: enrollment.timeSpentMinutes
       },
       project: {
-        id: enrollment.Project.id,
-        slug: enrollment.Project.slug,
-        title: enrollment.Project.title,
-        shortDesc: enrollment.Project.shortDesc,
-        level: enrollment.Project.level,
-        guidance: enrollment.Project.guidance,
+        id: enrollment.project.id,
+        slug: enrollment.project.slug,
+        title: enrollment.project.title,
+        shortDesc: enrollment.project.shortDesc,
+        level: enrollment.project.level,
+        guidance: enrollment.project.guidance,
         totalSteps
       },
       progress: {
@@ -348,8 +348,8 @@ export class UserService {
       name: user.name || '',
       school: user.school || '',
       class: user.classNum,
-      project: user.Project.title,
-      projectSlug: user.Project.slug,
+      project: user.project.title,
+      projectSlug: user.project.slug,
       enrolledAt: user.createdAt.toISOString(),
       lastActivity: user.lastActivityAt?.toISOString() || '',
       completedAt: user.completedAt?.toISOString() || '',
