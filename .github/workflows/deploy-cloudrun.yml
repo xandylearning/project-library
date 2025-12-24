@@ -7,7 +7,9 @@ on:
       - master
     paths:
       - 'backend/**'
+      - 'frontend/**'
       - 'Dockerfile'
+      - 'start.sh'
       - '.github/workflows/deploy-cloudrun.yml'
   pull_request:
     branches:
@@ -15,7 +17,9 @@ on:
       - master
     paths:
       - 'backend/**'
+      - 'frontend/**'
       - 'Dockerfile'
+      - 'start.sh'
 
 env:
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }} # e.g. developement-account

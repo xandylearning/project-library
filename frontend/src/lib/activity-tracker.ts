@@ -16,7 +16,9 @@ let currentEnrollmentId: string | null = null
  */
 async function trackActivity({ enrollmentId, activityType, metadata }: TrackActivityParams) {
   try {
-    await fetch(`${BASE_URL}/activity`, {
+    // Use relative URL if BASE_URL is empty (for Cloud Run where frontend proxies to backend)
+    const url = BASE_URL ? `${BASE_URL}/activity` : '/activity'
+    await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

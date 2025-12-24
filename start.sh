@@ -14,15 +14,15 @@ npx prisma db push --accept-data-loss
 echo "🔧 Generating Prisma client..."
 npx prisma generate
 
-# Start backend server in the background
-echo "🔌 Starting backend server on port 3000..."
-node dist/index.js &
+# Start backend server in the background on internal port 3001
+echo "🔌 Starting backend server on port 3001..."
+PORT=3001 node dist/index.js &
 BACKEND_PID=$!
 
 # Wait for backend to be ready
 echo "⏳ Waiting for backend to be ready..."
 for i in 1 2 3 4 5 6 7 8 9 10; do
-  if node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" 2>/dev/null; then
+  if node -e "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" 2>/dev/null; then
     echo "✅ Backend is ready!"
     break
   fi
@@ -30,15 +30,18 @@ for i in 1 2 3 4 5 6 7 8 9 10; do
   sleep 3
 done
 
-# Start frontend server
-echo "🎨 Starting frontend server on port 8080..."
+# Start frontend server on port 3000 (Cloud Run exposed port)
+echo "🎨 Starting frontend server on port 3000..."
 cd /app
-node frontend/server.js &
+# Set backend URL for Next.js rewrites (empty NEXT_PUBLIC_BACKEND_URL means use relative URLs)
+export NEXT_PUBLIC_BACKEND_URL=""
+export BACKEND_URL="http://localhost:3001"
+PORT=3000 node server.js &
 FRONTEND_PID=$!
 
 echo "✅ Project Library is running!"
-echo "   Backend:  http://localhost:3000"
-echo "   Frontend: http://localhost:8080"
+echo "   Backend:  http://localhost:3001 (internal)"
+echo "   Frontend: http://localhost:3000 (exposed)"
 
 # Function to handle shutdown
 shutdown() {

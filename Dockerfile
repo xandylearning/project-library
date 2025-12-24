@@ -101,9 +101,9 @@ ENV PORT=3000
 ENV DATABASE_URL="file:/app/backend/prisma/dev.db"
 ENV STORAGE_PATH="/app/backend/storage"
 
-# Health check
+# Health check (check frontend on port 3000)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+  CMD node -e "require('http').get('http://localhost:3000/', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]

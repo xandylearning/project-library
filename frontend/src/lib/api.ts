@@ -21,7 +21,8 @@ async function fetchAPI<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const url = `${BASE_URL}${endpoint}`
+  // Use relative URL if BASE_URL is empty (for Cloud Run where frontend proxies to backend)
+  const url = BASE_URL ? `${BASE_URL}${endpoint}` : endpoint
   
   const isFormData = options.body instanceof FormData
   const defaultHeaders: HeadersInit = isFormData
